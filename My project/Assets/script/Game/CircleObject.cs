@@ -8,10 +8,18 @@ public class CircleObject : MonoBehaviour
     public bool isUsed;
     Rigidbody2D rigidbody2D;
 
-    void Start()
+    public int index;
+
+    void Awake()
     {
         isUsed = false;
         rigidbody2D = GetComponent<Rigidbody2D>();
+        rigidbody2D.simulated = false;
+    }
+
+    void Start()
+    {
+        
     }
 
     void Update()
@@ -53,5 +61,41 @@ public class CircleObject : MonoBehaviour
         {
             Temp.gameObject.GetComponent<GameManager>().GenObject();
         }
+    }
+
+    public void Used()
+    {
+        isDrag = false;
+        isUsed = true;
+        rigidbody2D.simulated = true;
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (index >= 7)
+            return;
+
+        if (collision.gameObject.tag == "Fruit")
+        {
+            CircleObject temp = collision.gameObject.GetComponent<CircleObject>();
+
+            if(temp.index == index)
+            {
+                if(gameObject.GetInstanceID() > collision.gameObject.GetInstanceID())
+                {
+
+                    GameObject Temp = GameObject.FindWithTag("GameManager");
+                    if (Temp != null)
+                    {
+                        Temp.gameObject.GetComponent<GameManager>().MergeObject(index, gameObject.transform.position);
+                    }
+
+                    Destroy(temp.gameObject);
+                    Destroy(gameObject);
+                }
+            }
+
+        }
+
     }
 }
